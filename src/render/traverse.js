@@ -31,7 +31,7 @@ const omittedCloseTags = {
 function renderChildrenArray (seq, children, context) {
   for (let idx = 0; idx < children.length; idx++) {
     const child = children[idx];
-    if (child instanceof Array) {
+    if (Array.isArray(child)) {
       renderChildrenArray(seq, child, context);
     } else {
       traverse({
@@ -47,7 +47,7 @@ function renderChildrenArray (seq, children, context) {
 function renderChildren (seq, children, context) {
   if (!children) { return; }
 
-  if (children instanceof Array) {
+  if (Array.isArray(children)) {
     renderChildrenArray(seq, children, context);
   } else {
     traverse({
@@ -202,14 +202,18 @@ function emitText (seq, text, numChildren) {
   }
 }
 
-function shouldEmitByType (seq, node) {
+function shouldEmitByType (seq, node, numChildren) {
+  const hasSiblings = numChildren > 1;
+
   if (node === undefined) {
     return false;
   }
 
   // A Component's render function might return `null`.
   if (node === null) {
-    emitEmpty(seq);
+    if (!hasSiblings) {
+      emitEmpty(seq);
+    }
     return false;
   }
 
@@ -232,7 +236,7 @@ function shouldEmitByType (seq, node) {
  * @return     {undefined}          No return value.
  */
 function traverse ({ seq, node, context, numChildren }) {
-  if (!shouldEmitByType(seq, node)) {
+  if (!shouldEmitByType(seq, node, numChildren)) {
     return;
   }
 
