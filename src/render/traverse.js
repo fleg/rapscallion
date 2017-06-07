@@ -45,7 +45,7 @@ function renderChildrenArray (seq, children, context) {
 }
 
 function renderChildren (seq, children, context) {
-  if (!children) { return; }
+  if (children === undefined) { return; }
 
   if (Array.isArray(children)) {
     renderChildrenArray(seq, children, context);
