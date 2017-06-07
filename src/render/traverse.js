@@ -74,7 +74,7 @@ function renderNode (seq, node, context) {
   seq.emit(() => omittedCloseTags[node.type] ? "/>" : ">");
   if (node.props.dangerouslySetInnerHTML) {
     seq.emit(() => node.props.dangerouslySetInnerHTML.__html || "");
-  } else {
+  } else if (node.props.children !== null) {
     seq.delegate(() => renderChildren(seq, node.props.children, context, node));
   }
   if (!omittedCloseTags[node.type]) {
@@ -202,18 +202,8 @@ function emitText (seq, text, numChildren) {
   }
 }
 
-function shouldEmitByType (seq, node, numChildren) {
-  const hasSiblings = numChildren > 1;
-
+function shouldEmitByType (seq, node) {
   if (node === undefined) {
-    return false;
-  }
-
-  // A Component's render function might return `null`.
-  if (node === null) {
-    if (!hasSiblings) {
-      emitEmpty(seq);
-    }
     return false;
   }
 
@@ -235,14 +225,19 @@ function shouldEmitByType (seq, node, numChildren) {
  *
  * @return     {undefined}          No return value.
  */
+// eslint-disable-next-line max-statements
 function traverse ({ seq, node, context, numChildren }) {
-  if (!shouldEmitByType(seq, node, numChildren)) {
+  if (!shouldEmitByType(seq, node)) {
+    return;
+  }
+
+  if (node === null) {
+    emitEmpty(seq);
     return;
   }
 
   switch (typeof node) {
   case "string": {
-
     // Text node.
     emitText(seq, htmlStringEscape(node), numChildren);
 

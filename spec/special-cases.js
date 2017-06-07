@@ -4,12 +4,40 @@ import { render } from "../src";
 
 
 describe("special cases", () => {
-  it("renders components that return null", () => {
+  it("renders components that return null without data attrs", () => {
     const NullComponent = () => null;
     const Parent = () => <div><NullComponent /></div>;
 
     return render(<Parent />).includeDataReactAttrs(false).toPromise().then(html => {
       expect(html).to.equal("<div></div>");
+    });
+  });
+  it("renders components that return null with data attrs", () => {
+    const NullComponent = () => null;
+    const Parent = () => <div><NullComponent /></div>;
+
+    // eslint-disable-next-line max-len
+    const expected = "<div data-reactroot=\"\" data-reactid=\"1\" data-react-checksum=\"585373152\"><!-- react-empty: 2 --></div>";
+
+    return render(<Parent />).toPromise().then(html => {
+      expect(html).to.equal(expected);
+    });
+  });
+  it("renders expression that return null without data attrs", () => {
+    const Parent = () => <div>{null}</div>;
+
+    return render(<Parent />).includeDataReactAttrs(false).toPromise().then(html => {
+      expect(html).to.equal("<div></div>");
+    });
+  });
+  it("renders expression that return null with data attrs", () => {
+    const Parent = () => <div>{null}</div>;
+
+    // eslint-disable-next-line max-len
+    const expected = "<div data-reactroot=\"\" data-reactid=\"1\" data-react-checksum=\"1998851930\"></div>";
+
+    return render(<Parent />).toPromise().then(html => {
+      expect(html).to.equal(expected);
     });
   });
   it("renders empty comments for components that return null", () => {
@@ -46,6 +74,13 @@ describe("special cases", () => {
     }
     return render(<C foo="bar"/>).includeDataReactAttrs(false).toPromise().then(html => {
       expect(html).to.equal("<div>bar</div>");
+    });
+  });
+  it("renders 0 as number", () => {
+    const ZeroComponent = () => <div>{0}</div>;
+
+    return render(<ZeroComponent />).includeDataReactAttrs(false).toPromise().then(html => {
+      expect(html).to.equal("<div>0</div>");
     });
   });
 });
