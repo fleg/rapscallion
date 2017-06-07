@@ -75,7 +75,11 @@ function renderNode (seq, node, context) {
   if (node.props.dangerouslySetInnerHTML) {
     seq.emit(() => node.props.dangerouslySetInnerHTML.__html || "");
   } else if (node.props.children !== null) {
-    seq.delegate(() => renderChildren(seq, node.props.children, context, node));
+    let children = node.props.children;
+    if (Array.isArray(children)) {
+      children = children.filter(Boolean);
+    }
+    seq.delegate(() => renderChildren(seq, children, context, node));
   }
   if (!omittedCloseTags[node.type]) {
     seq.emit(() => `</${node.type}>`);

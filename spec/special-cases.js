@@ -40,6 +40,26 @@ describe("special cases", () => {
       expect(html).to.equal(expected);
     });
   });
+  it("renders expression that return array with some null items", () => {
+    const Parent = () => <div>{[null, <div key={1}>foo</div>, null]}</div>;
+
+    // eslint-disable-next-line max-len
+    const expected = "<div data-reactroot=\"\" data-reactid=\"1\" data-react-checksum=\"-11200067\"><div data-reactid=\"2\">foo</div></div>";
+
+    return render(<Parent />).toPromise().then(html => {
+      expect(html).to.equal(expected);
+    });
+  });
+  it("renders expression that return array with all null items", () => {
+    const Parent = () => <div>{[null, null, null]}</div>;
+
+    // eslint-disable-next-line max-len
+    const expected = "<div data-reactroot=\"\" data-reactid=\"1\" data-react-checksum=\"1998851930\"></div>";
+
+    return render(<Parent />).toPromise().then(html => {
+      expect(html).to.equal(expected);
+    });
+  });
   it("renders empty comments for components that return null", () => {
     const NullComponent = () => null;
 
