@@ -83,7 +83,10 @@ function stringifyStyle (name, value) {
   let val;
 
   if (value && typeof value === "object" && Object.keys(value).length) {
-    val = toStringWithValue(name, renderStyleAttribute(value));
+    const style = renderStyleAttribute(value);
+    if (style.length) {
+      val = toStringWithValue(name, style);
+    }
   }
 
   return val;
