@@ -5,6 +5,8 @@ const DOMProperty = require("react-dom/lib/DOMProperty");
 const ARIADOMPropertyConfig = require("react-dom/lib/ARIADOMPropertyConfig");
 const HTMLDOMPropertyConfig = require("react-dom/lib/HTMLDOMPropertyConfig");
 const SVGDOMPropertyConfig = require("react-dom/lib/SVGDOMPropertyConfig");
+const DOMPropertyOperations = require("react-dom/lib/DOMPropertyOperations");
+const CSSPropertyOperations = require("react-dom/lib/CSSPropertyOperations");
 
 if (Object.keys(DOMProperty.properties).length === 0) {
   DOMProperty.injection.injectDOMPropertyConfig(ARIADOMPropertyConfig);
@@ -12,14 +14,10 @@ if (Object.keys(DOMProperty.properties).length === 0) {
   DOMProperty.injection.injectDOMPropertyConfig(SVGDOMPropertyConfig);
 }
 
-const DOMPropertyOperations = require("react-dom/lib/DOMPropertyOperations");
-const CSSPropertyOperations = require("react-dom/lib/CSSPropertyOperations");
-
-const STYLE = "style";
 const RESERVED_PROPS = {
-  children: null,
-  dangerouslySetInnerHTML: null,
-  suppressContentEditableWarning: null
+  children: true,
+  dangerouslySetInnerHTML: true,
+  suppressContentEditableWarning: true
 };
 
 function isCustomNode (node) {
@@ -41,7 +39,7 @@ function renderAttrs (attrs, node) {
   for (const attrKey in attrs) {
     let attrValue = attrs[attrKey];
 
-    if (attrKey === STYLE) {
+    if (attrKey === "style") {
       if (!isObject(attrValue)) {
         continue;
       }
@@ -55,7 +53,7 @@ function renderAttrs (attrs, node) {
 
     let markup = null;
     if (DOMProperty.isCustomAttribute(attrKey) || node && isCustomNode(node)) {
-      if (!RESERVED_PROPS.hasOwnProperty(attrKey)) {
+      if (!RESERVED_PROPS[attrKey]) {
         markup = DOMPropertyOperations.createMarkupForCustomAttribute(attrKey, attrValue);
       }
     } else {
@@ -64,7 +62,6 @@ function renderAttrs (attrs, node) {
     if (markup) {
       result += ` ${markup}`;
     }
-
   }
 
   return result;
