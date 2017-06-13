@@ -1,3 +1,4 @@
+const assign = require("lodash/assign");
 const isObject = require("lodash/isObject");
 const isString = require("lodash/isString");
 const mapValues = require("lodash/mapValues");
@@ -33,8 +34,19 @@ function isCustomNode (node) {
  *
  * @return     {String}          Generated HTML attribute output.
  */
+// eslint-disable-next-line max-statements
 function renderAttrs (attrs, node) {
   let result = "";
+
+  if (node && node.type === "input") {
+    // from ReactDOMInput.getHostProps
+    attrs = assign({
+      type: undefined,
+      step: undefined,
+      min: undefined,
+      max: undefined
+    }, attrs);
+  }
 
   for (const attrKey in attrs) {
     let attrValue = attrs[attrKey];
