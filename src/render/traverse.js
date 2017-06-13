@@ -69,7 +69,7 @@ function renderChildren (seq, children, context) {
  */
 function renderNode (seq, node, context) {
   seq.emit(() => `<${node.type}`);
-  seq.emit(() => renderAttrs(node.props, seq));
+  seq.emit(() => renderAttrs(node.props, node));
   seq.emit(() => REACT_ID);
   seq.emit(() => omittedCloseTags[node.type] ? "/>" : ">");
   if (node.props.dangerouslySetInnerHTML) {

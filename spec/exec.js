@@ -28,3 +28,4 @@ require("./escape-html");
 require("./styles");
 require("./attrs");
 require("./render-error");
+require("./attributes");
