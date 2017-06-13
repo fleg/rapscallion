@@ -29,3 +29,4 @@ require("./styles");
 require("./attrs");
 require("./render-error");
 require("./attributes");
+require("./elements");
