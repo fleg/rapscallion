@@ -90,6 +90,10 @@ function renderNode (seq, node, context) {
   if (node.props.dangerouslySetInnerHTML) {
     seq.emit(() => node.props.dangerouslySetInnerHTML.__html || "");
   } else if (node.props.children !== null) {
+    if (node.type === "textarea" && node.props.value) {
+      seq.emit(() => node.props.value);
+    }
+
     seq.delegate(() => renderChildren({
       seq,
       context,
@@ -164,7 +168,7 @@ function evalSegment (seq, segment, context) {
   } else if (segment.__prerendered__ === "expression") {
     if (typeof segment.expression === "string") {
       seq.emit(() => htmlStringEscape(segment.expression));
-    } else if (segment.expression instanceof Array) {
+    } else if (Array.isArray(segment.expression)) {
       segment.expression.forEach(subsegment => traverse({
         seq,
         node: subsegment,
@@ -190,7 +194,7 @@ function evalPreRendered (seq, node, context) {
   const prerenderType = node.__prerendered__;
   if (prerenderType === "dom") {
     node.segments.forEach(segment => {
-      if (segment instanceof Array) {
+      if (Array.isArray(segment)) {
         segment.forEach(subsegment => evalSegment(seq, subsegment, context));
       } else {
         evalSegment(seq, segment, context);
@@ -209,7 +213,7 @@ function emitEmpty (seq) {
 }
 
 function emitText ({ seq, text, numChildren, isNewlineEatingTag }) {
-  const hasSiblings = numChildren > 1;
+  const hasSiblings = Boolean(numChildren);
 
   if (hasSiblings) {
     seq.emit(() => REACT_TEXT_START);
@@ -227,15 +231,9 @@ function emitText ({ seq, text, numChildren, isNewlineEatingTag }) {
 }
 
 function shouldEmitByType (seq, node) {
-  if (node === undefined) {
-    return false;
-  }
-
-  if (node === false) {
-    return false;
-  }
-
-  return true;
+  return node !== undefined &&
+    node !== false &&
+    node !== true;
 }
 
 /**

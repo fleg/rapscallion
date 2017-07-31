@@ -1,7 +1,18 @@
+// `react-dom` expects that certain of its subcomponents are loaded in a particular
+// order.  Because of this, requiring the `react-dom/*` submodules below results in
+// the following error:
+//
+//    You're trying to inject DOM property 'aria-current' which has
+//    already been injected.
+//
+// Requiring `react-dom` early resolves this issue.
+require("react-dom");
+
 const assign = require("lodash/assign");
 const isObject = require("lodash/isObject");
 const isString = require("lodash/isString");
 const mapValues = require("lodash/mapValues");
+const omit = require("lodash/omit");
 const DOMProperty = require("react-dom/lib/DOMProperty");
 const ARIADOMPropertyConfig = require("react-dom/lib/ARIADOMPropertyConfig");
 const HTMLDOMPropertyConfig = require("react-dom/lib/HTMLDOMPropertyConfig");
@@ -38,14 +49,18 @@ function isCustomNode (node) {
 function renderAttrs (attrs, node) {
   let result = "";
 
-  if (node && node.type === "input") {
-    // from ReactDOMInput.getHostProps
-    attrs = assign({
-      type: undefined,
-      step: undefined,
-      min: undefined,
-      max: undefined
-    }, attrs);
+  if (node) {
+    if (node.type === "input") {
+      // from ReactDOMInput.getHostProps
+      attrs = assign({
+        type: undefined,
+        step: undefined,
+        min: undefined,
+        max: undefined
+      }, attrs);
+    } else if (node.type === "textarea") {
+      attrs = omit(attrs, "value");
+    }
   }
 
   for (const attrKey in attrs) {
